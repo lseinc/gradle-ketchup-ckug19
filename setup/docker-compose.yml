@@ -1,0 +1,59 @@
+version: "3.1"
+services:
+  jenkins:
+    image: jenkins/jenkins:lts
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 30s
+      update_config:
+        failure_action: pause
+        parallelism: 1
+        delay: 60s
+    environment:
+      - JENKINS_OPTS=
+      - DOCKER_OPTS=--insecure-registry="192.168.65.3:4188"'
+    ports:
+      - "4080:8080"
+    volumes:
+      - jenkins_home:/var/jenkins_home
+  nexus:
+    image: sonatype/nexus3
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 30s
+      update_config:
+        failure_action: pause
+        parallelism: 1
+        delay: 60s
+    environment:
+      - USER=admin
+      - PASS=admin123
+    ports:
+      - "4181:8081"
+      - "4187:4187"
+      - "4188:4188"
+      - "4189:4189"
+    volumes:
+      - nexus_data:/nexus-data
+  gitea:
+    image: gitea/gitea:1
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 30s
+      update_config:
+        failure_action: pause
+        parallelism: 1
+        delay: 60s
+    ports:
+      - "4280:3000"
+      - "4222:22"
+    volumes:
+      - gitea_data:/data
+volumes:
+      jenkins_home:
+      nexus_data:
+      gitea_data:
+
